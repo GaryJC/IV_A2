@@ -41,6 +41,7 @@ var mapData = (newData, dataKey, dataVal, bool) => {
       }
     }
   }
+  return newData;
 };
 
 //map with majors and corresponded grad salary
@@ -82,13 +83,13 @@ let data = {
   labels: category_label,
   datasets: [
     {
-      label: "Graduate Salary",
+      label: "Graduate Earnings",
       data: category_grad_salary_med,
       backgroundColor: "rgba(54, 162, 235, 0.4)",
       hoverBackgroundColor: "rgba(54, 162, 235, 0.8)",
     },
     {
-      label: "Undergraduate Salary",
+      label: "Undergraduate Earnings",
       data: category_ungrad_salary_med,
       backgroundColor: "rgba(255, 99, 132, 0.4)",
       hoverBackgroundColor: "rgba(255, 99, 132, 0.8)",
@@ -112,7 +113,13 @@ let config = {
     plugins: {
       title: {
         display: true,
-        text: "Chart.js Bar Chart - Stacked",
+        text: "College Majors Earnings",
+        font: { size: 20 },
+      },
+      subtitle: {
+        display: true,
+        text: "Major Categories",
+        font: { size: 16, weight: "bold" },
       },
     },
     responsive: true,
@@ -192,6 +199,7 @@ $("#majorForm input").on("change", () => {
     salaryChart.config.data.labels = all_major_label;
     salaryChart.config.data.datasets[0].data = grad_salary_med;
     salaryChart.config.data.datasets[1].data = ungrad_salary_med;
+    salaryChart.config.options.plugins.subtitle.text = "Majors";
     salaryChart.update();
   } else {
     isFiltered = false;
@@ -204,55 +212,9 @@ $("#majorForm input").on("change", () => {
       ungrad_salary_med_map,
       grad_salary_med_map
     );
+    salaryChart.config.options.plugins.subtitle.text = "Major Categories";
     salaryChart.update();
   }
-});
-
-$("#typeForm input").on("change", () => {
-  let selVal = $("input[name=dataType]:checked", "#typeForm").val();
-  if (isAll === false) {
-    if (selVal === "med") {
-      salaryChart.config.data.datasets[0].data = category_grad_salary_med;
-      salaryChart.config.data.datasets[1].data = category_ungrad_salary_med;
-    } else if (selVal === "p75") {
-      let p75CatGrad = new Map();
-      let p75CatUngrad = new Map();
-      mapData(p75CatGrad, "Major_category", "Grad_P75", "grad");
-      mapData(p75CatUngrad, "Major_category", "Nongrad_P75", "ungrad");
-      salaryChart.config.data.datasets[0].data = [...p75CatGrad.values()];
-      salaryChart.config.data.datasets[1].data = [...p75CatUngrad.values()];
-    } else {
-      let p25CatGrad = new Map();
-      let p25CatUngrad = new Map();
-      mapData(p25CatGrad, "Major_category", "Grad_P25", "grad");
-      mapData(p25CatUngrad, "Major_category", "Nongrad_P25", "ungrad");
-      salaryChart.config.data.datasets[0].data = [...p25CatGrad.values()];
-      salaryChart.config.data.datasets[1].data = [...p25CatUngrad.values()];
-    }
-    salaryChart.config.data.labels = category_label;
-  }
-  if (isAll === true) {
-    if (selVal === "med") {
-      salaryChart.config.data.datasets[0].data = grad_salary_med;
-      salaryChart.config.data.datasets[1].data = ungrad_salary_med;
-    } else if (selVal === "p75") {
-      let p75Grad = new Map();
-      let p75Ungrad = new Map();
-      mapData(p75Grad, "Major", "Grad_P75");
-      mapData(p75Ungrad, "Major", "Nongrad_P75");
-      salaryChart.config.data.datasets[0].data = [...p75Grad.values()];
-      salaryChart.config.data.datasets[1].data = [...p75Ungrad.values()];
-    } else {
-      let p25Grad = new Map();
-      let p25Ungrad = new Map();
-      mapData(p25Grad, "Major", "Grad_P25");
-      mapData(p25Ungrad, "Major", "Nongrad_P25");
-      salaryChart.config.data.datasets[0].data = [...p25Grad.values()];
-      salaryChart.config.data.datasets[1].data = [...p25Ungrad.values()];
-    }
-    salaryChart.config.data.labels = all_major_label;
-  }
-  salaryChart.update();
 });
 
 function sortHalf(unsorted, sorted) {
@@ -287,7 +249,7 @@ document.getElementById("salaryChart").onclick = function (evt) {
     console.log(activePoints);
     datasetIndex = activePoints[0].datasetIndex;
     selectedCat = salaryChart.config.data.labels[activePoints[0].index];
-    let filteredData = dataset.filter((item) => {
+    filteredData = dataset.filter((item) => {
       return item.Major_category == selectedCat;
     });
 
@@ -317,6 +279,7 @@ document.getElementById("salaryChart").onclick = function (evt) {
       salaryChart.config.data.datasets[0].hidden = true;
       isFiltered = true;
     }
+    salaryChart.config.options.plugins.subtitle.text = "Majors";
     salaryChart.update();
   }
 };
@@ -339,21 +302,3 @@ $("#sortbyMajor").change(() => {
 });
 
 $("#sortbyMajor").hide();
-
-// $("#reset").click(() => {
-//   salaryChart.config.data.labels = category_label;
-//   mapData(grad_salary_med_map, "Major_category", "Grad_median");
-//   mapData(ungrad_salary_med_map, "Major_category", "Nongrad_median");
-//   for (let [key, val] of grad_salary_med_map) {
-//     grad_salary_med_map.set(key, val / category_count.get(key));
-//   }
-//   for (let [key, val] of ungrad_salary_med_map) {
-//     ungrad_salary_med_map.set(key, val / category_count.get(key));
-//   }
-//   category_label = [...grad_salary_med_map.keys()];
-//   salaryChart.config.data.datasets[0].data = [...grad_salary_med_map.values()];
-//   salaryChart.config.data.datasets[1].data = [
-//     ...ungrad_salary_med_map.values(),
-//   ];
-//   salaryChart.update();
-// });

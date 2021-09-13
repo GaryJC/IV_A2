@@ -33,44 +33,44 @@
       referrerpolicy="no-referrer"
     ></script>
     <script src="data.js"></script>
-    <script src="main.js"></script>
     <title>index</title>
   </head>
   <body>
     <div>
-      <label>Sort</label>
-      <select name="sortby" id="sortby">
-        <option value="" disabled selected>Select your option</option>
-        <optgroup label="sort by graduate">
-          <option value="asc_grad">Sort by grad Asc</option>
-          <option value="dsc_grad">Sort by grad Dsc</option>
-        </optgroup>
-        <optgroup label="sort by ungraduate">
-          <option value="asc_ungrad">Sort by ungrad Asc</option>
-          <option value="dsc_ungrad">Sort by ungrad Dsc</option>
-        </optgroup>
-      </select>
-      <select name="sortbyMajor" id="sortbyMajor">
-        <option value="" disabled selected>Select your option</option>
-        <option value="asc_major">Sort by Asc</option>
-        <option value="dsc_major">Sort by Dsc</option>
-      </select>
-      <form id="majorForm">
-        <input type="checkbox" name="showAll" id="showAll" value="showAll" />
-        <label>Display All Majors</label>
-      </form>
-      <form id="typeForm">
-        <input type="radio" id="med" name="dataType" value="med" />
-        <label for="age1">med</label><br />
-        <input type="radio" id="p25" name="dataType" value="p25" />
-        <label for="age2">p25</label><br />
-        <input type="radio" id="p75" name="dataType" value="p75" />
-        <label for="age3">p75</label><br />
-      </form>
-      <!-- <button id="reset">Reset</button> -->
+      <div class="filter">
+        <label>Sort</label>
+        <select name="sortby" id="sortby">
+          <option value="" disabled selected>Select your option</option>
+          <optgroup label="Sort by Graduate">
+            <option value="asc_grad">Ascending Order</option>
+            <option value="dsc_grad">Descending Order</option>
+          </optgroup>
+          <optgroup label="Sort by Undergraduate">
+            <option value="asc_ungrad">Ascending Order</option>
+            <option value="dsc_ungrad">Descending Order</option>
+          </optgroup>
+        </select>
+        <select name="sortbyMajor" id="sortbyMajor">
+          <option value="" disabled selected>Select your option</option>
+          <option value="asc_major">Ascending Order</option>
+          <option value="dsc_major">Descending Order</option>
+        </select>
+        <form id="majorForm">
+          <input type="checkbox" name="showAll" id="showAll" value="showAll" />
+          <label>Display All Majors</label>
+        </form>
+        <form id="typeForm">
+          <input type="radio" id="med" name="dataType" value="med" checked />
+          <label for="age1">med</label>
+          <input type="radio" id="p25" name="dataType" value="p25" />
+          <label for="age2">p25</label>
+          <input type="radio" id="p75" name="dataType" value="p75" />
+          <label for="age3">p75</label>
+        </form>
+      </div>
       <canvas id="salaryChart"> </canvas>
+      <script src="salaryChart.js"></script>
+      <script src="changeDataType.js"></script>
     </div>
-    <script src="salaryChart.js"></script>
-    <div></div>
   </body>
 </html>
