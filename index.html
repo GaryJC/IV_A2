@@ -51,9 +51,18 @@
           </optgroup>
         </select>
         <select name="sortbyMajor" id="sortbyMajor">
-          <option value="" disabled selected>Select your option</option>
+          <!-- <option value="" disabled selected>Select your option</option>
           <option value="asc_major">Ascending Order</option>
-          <option value="dsc_major">Descending Order</option>
+          <option value="dsc_major">Descending Order</option> -->
+          <option value="" disabled selected>Select your option</option>
+          <optgroup label="Sort by Graduate">
+            <option value="asc_grad">Ascending Order</option>
+            <option value="dsc_grad">Descending Order</option>
+          </optgroup>
+          <optgroup label="Sort by Undergraduate">
+            <option value="asc_ungrad">Ascending Order</option>
+            <option value="dsc_ungrad">Descending Order</option>
+          </optgroup>
         </select>
         <form id="majorForm">
           <input type="checkbox" name="showAll" id="showAll" value="showAll" />
@@ -67,10 +76,20 @@
           <input type="radio" id="p75" name="dataType" value="p75" />
           <label for="age3">p75</label>
         </form>
+        <form id="rateLine">
+          <input
+            type="checkbox"
+            name="showLine"
+            id="showLine"
+            value="showLine"
+          />
+          <label>Show Unemployment Rate</label>
+        </form>
       </div>
       <canvas id="salaryChart"> </canvas>
       <script src="salaryChart.js"></script>
       <script src="changeDataType.js"></script>
+      <script src="lineChart.js"></script>
     </div>
   </body>
 </html>

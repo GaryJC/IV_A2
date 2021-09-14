@@ -94,7 +94,6 @@ $("#typeForm input").on("change", () => {
       salaryChart.update();
     }
   }
-  console.log(isFiltered);
   if (isFiltered == true && isAll == false) {
     if (selVal == "p25") {
       filteredGradData = new Map(

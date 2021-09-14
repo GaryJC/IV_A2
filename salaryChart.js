@@ -50,21 +50,15 @@ mapData(grad_major_salary_med_map, "Major", "Grad_median");
 
 //map with majors and corresponded ungrad salary
 let ungrad_major_salary_med_map = new Map();
-mapData(ungrad_major_salary_med_map, "Major", "Grad_median");
+mapData(ungrad_major_salary_med_map, "Major", "Nongrad_median");
 
 //map with major category and corresponded grad salary
 let grad_salary_med_map = new Map();
 mapData(grad_salary_med_map, "Major_category", "Grad_median", "grad");
-// for (let [key, val] of grad_salary_med_map) {
-//   grad_salary_med_map.set(key, val / category_count.get(key));
-// }
 
 //map with major category and corresponded ungrad salary
 let ungrad_salary_med_map = new Map();
 mapData(ungrad_salary_med_map, "Major_category", "Nongrad_median", "ungrad");
-// for (let [key, val] of ungrad_salary_med_map) {
-//   ungrad_salary_med_map.set(key, val / category_count.get(key));
-// }
 
 let category_label = [...grad_salary_med_map.keys()];
 let category_grad_salary_med = [...grad_salary_med_map.values()];
@@ -87,12 +81,14 @@ let data = {
       data: category_grad_salary_med,
       backgroundColor: "rgba(54, 162, 235, 0.4)",
       hoverBackgroundColor: "rgba(54, 162, 235, 0.8)",
+      maxBarThickness: 80,
     },
     {
       label: "Undergraduate Earnings",
       data: category_ungrad_salary_med,
       backgroundColor: "rgba(255, 99, 132, 0.4)",
       hoverBackgroundColor: "rgba(255, 99, 132, 0.8)",
+      maxBarThickness: 80,
     },
   ],
 };
@@ -126,9 +122,28 @@ let config = {
     scales: {
       x: {
         stacked: true,
+        ticks: {
+          display: true,
+          callback: function (value) {
+            if (this.getLabelForValue(value).length > 10) {
+              return this.getLabelForValue(value).substr(0, 11) + "...";
+            }
+            return this.getLabelForValue(value);
+          },
+        },
       },
       y: {
         stacked: true,
+      },
+      unempRateAxis: {
+        type: "linear",
+        display: false,
+        position: "right",
+
+        // grid line settings
+        grid: {
+          drawOnChartArea: false, // only want the grid lines for one axis to show up
+        },
       },
     },
   },
@@ -137,7 +152,6 @@ let config = {
 var salaryChart = new Chart(document.getElementById("salaryChart"), config);
 
 var sortByAsc = (main, rely, f, s) => {
-  console.log(main, rely, f, s);
   main = new Map([...main].sort((a, b) => a[1] - b[1]));
   salaryChart.config.data.labels = [...main.keys()];
   salaryChart.config.data.datasets[f].data = [...main.values()];
@@ -150,6 +164,18 @@ var sortByDsc = (main, rely, f, s) => {
   salaryChart.config.data.datasets[f].data = [...main.values()];
   salaryChart.config.data.datasets[s].data = sortHalf(rely, main);
 };
+
+function sortHalf(unsorted, sorted) {
+  unsorted = new Map(
+    [...unsorted].sort(function (a, b) {
+      return (
+        [...sorted.keys()].indexOf(a[0]) - [...sorted.keys()].indexOf(b[0])
+      );
+    })
+  );
+
+  return [...unsorted.values()];
+}
 
 $("#sortby").change(() => {
   if ($("#sortby").val() == "asc_grad") {
@@ -200,6 +226,7 @@ $("#majorForm input").on("change", () => {
     salaryChart.config.data.datasets[0].data = grad_salary_med;
     salaryChart.config.data.datasets[1].data = ungrad_salary_med;
     salaryChart.config.options.plugins.subtitle.text = "Majors";
+    // salaryChart.config.options.scales.x.ticks.display = false;
     salaryChart.update();
   } else {
     isFiltered = false;
@@ -213,21 +240,10 @@ $("#majorForm input").on("change", () => {
       grad_salary_med_map
     );
     salaryChart.config.options.plugins.subtitle.text = "Major Categories";
+    // salaryChart.config.options.scales.x.ticks.display = true;
     salaryChart.update();
   }
 });
-
-function sortHalf(unsorted, sorted) {
-  unsorted = new Map(
-    [...unsorted].sort(function (a, b) {
-      return (
-        [...sorted.keys()].indexOf(a[0]) - [...sorted.keys()].indexOf(b[0])
-      );
-    })
-  );
-
-  return [...unsorted.values()];
-}
 
 let isFiltered = false;
 let datasetIndex,
@@ -236,6 +252,7 @@ let datasetIndex,
   filteredLabel,
   filteredGradData,
   filteredUngradData;
+
 document.getElementById("salaryChart").onclick = function (evt) {
   var activePoints = salaryChart.getElementsAtEventForMode(
     evt,
@@ -246,9 +263,11 @@ document.getElementById("salaryChart").onclick = function (evt) {
   if (isFiltered == false && activePoints.length) {
     $("#sortbyMajor").show();
     $("#sortby").hide();
+    $("#rateLine").show();
     console.log(activePoints);
     datasetIndex = activePoints[0].datasetIndex;
     selectedCat = salaryChart.config.data.labels[activePoints[0].index];
+
     filteredData = dataset.filter((item) => {
       return item.Major_category == selectedCat;
     });
@@ -259,46 +278,98 @@ document.getElementById("salaryChart").onclick = function (evt) {
     filteredUngradData = new Map(
       filteredData.map((i) => [i.Major, i.Nongrad_median])
     );
-    console.log(filteredGradData);
     filteredLabel = filteredData.map((item) => item.Major);
-
-    if (datasetIndex == 0) {
-      salaryChart.config.data.labels = filteredLabel;
-      salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
-      salaryChart.config.data.datasets[1].data = [
-        ...filteredUngradData.values(),
-      ];
-      salaryChart.config.data.datasets[1].hidden = true;
-      isFiltered = true;
-    } else if (datasetIndex == 1) {
-      salaryChart.config.data.labels = filteredLabel;
-      salaryChart.config.data.datasets[1].data = [
-        ...filteredUngradData.values(),
-      ];
-      salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
-      salaryChart.config.data.datasets[0].hidden = true;
-      isFiltered = true;
-    }
+    salaryChart.config.data.labels = filteredLabel;
+    salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
+    salaryChart.config.data.datasets[1].data = [...filteredUngradData.values()];
+    isFiltered = true;
+    // if (datasetIndex == 0) {
+    //   salaryChart.config.data.labels = filteredLabel;
+    //   salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
+    //   salaryChart.config.data.datasets[1].data = [
+    //     ...filteredUngradData.values(),
+    //   ];
+    //   salaryChart.config.data.datasets[1].hidden = true;
+    //   isFiltered = true;
+    // } else if (datasetIndex == 1) {
+    //   salaryChart.config.data.labels = filteredLabel;
+    //   salaryChart.config.data.datasets[1].data = [
+    //     ...filteredUngradData.values(),
+    //   ];
+    //   salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
+    //   salaryChart.config.data.datasets[0].hidden = true;
+    //   isFiltered = true;
+    // }
     salaryChart.config.options.plugins.subtitle.text = "Majors";
     salaryChart.update();
   }
 };
 
+// $("#sortbyMajor").change(() => {
+//   // order grad salary by asc
+//   if ($("#sortbyMajor").val() == "asc_major" && datasetIndex == 0) {
+//     sortByAsc(filteredGradData, filteredUngradData, 0, 1);
+//   }
+//   // sortByAsc(gradUnempRate, ungradUnempRate, 2, 3);
+
+//   if ($("#sortbyMajor").val() == "dsc_major" && datasetIndex == 0) {
+//     sortByDsc(filteredGradData, filteredUngradData, 0, 1);
+//   }
+//   if ($("#sortbyMajor").val() == "asc_major" && datasetIndex == 1) {
+//     sortByAsc(filteredUngradData, filteredGradData, 1, 0);
+//   }
+//   if ($("#sortbyMajor").val() == "dsc_major" && datasetIndex == 1) {
+//     sortByDsc(filteredUngradData, filteredGradData, 1, 0);
+//   }
+//   salaryChart.update();
+// });
+
 $("#sortbyMajor").change(() => {
-  // order grad salary by asc
-  if ($("#sortbyMajor").val() == "asc_major" && datasetIndex == 0) {
-    sortByAsc(filteredGradData, filteredUngradData, 0, 1);
+  if (isLineShown === false) {
+    if ($("#sortbyMajor").val() == "asc_grad") {
+      sortByAsc(filteredGradData, filteredUngradData, 0, 1);
+    }
+    if ($("#sortbyMajor").val() == "dsc_grad") {
+      sortByDsc(filteredGradData, filteredUngradData, 0, 1);
+    }
+    if ($("#sortbyMajor").val() == "asc_ungrad") {
+      sortByAsc(filteredUngradData, filteredGradData, 1, 0);
+    }
+    if ($("#sortbyMajor").val() == "dsc_ungrad") {
+      sortByDsc(filteredUngradData, filteredGradData, 1, 0);
+    }
+  } else {
+    if ($("#sortbyMajor").val() == "asc_grad") {
+      sortByAsc(filteredGradData, filteredUngradData, 0, 1);
+      sortByAsc(filteredGradData, gradUnempRate, 0, 2);
+      sortByAsc(filteredGradData, ungradUnempRate, 0, 3);
+    }
+    if ($("#sortbyMajor").val() == "dsc_grad") {
+      sortByDsc(filteredGradData, filteredUngradData, 0, 1);
+      sortByDsc(filteredGradData, gradUnempRate, 0, 2);
+      sortByDsc(filteredGradData, ungradUnempRate, 0, 3);
+    }
+    if ($("#sortbyMajor").val() == "asc_ungrad") {
+      sortByAsc(filteredUngradData, filteredGradData, 1, 0);
+      sortByAsc(filteredUngradData, gradUnempRate, 1, 2);
+      sortByAsc(filteredUngradData, ungradUnempRate, 1, 3);
+    }
+    if ($("#sortbyMajor").val() == "dsc_ungrad") {
+      sortByDsc(filteredUngradData, filteredGradData, 1, 0);
+      sortByDsc(filteredUngradData, gradUnempRate, 1, 2);
+      sortByDsc(filteredUngradData, ungradUnempRate, 1, 3);
+    }
   }
-  if ($("#sortbyMajor").val() == "dsc_major" && datasetIndex == 0) {
-    sortByDsc(filteredGradData, filteredUngradData, 0, 1);
-  }
-  if ($("#sortbyMajor").val() == "asc_major" && datasetIndex == 1) {
-    sortByAsc(filteredUngradData, filteredGradData, 1, 0);
-  }
-  if ($("#sortbyMajor").val() == "dsc_major" && datasetIndex == 1) {
-    sortByDsc(filteredUngradData, filteredGradData, 1, 0);
-  }
+  // else {
+  //   for (let i = 0; i < 2; i++) {
+  //     salaryChart.config.data.datasets.pop();
+  //   }
+  //   salaryChart.config.options.scales.unempRateAxis.display = false;
+
+  //   $("#showLine").prop("checked", false);
+  // }
   salaryChart.update();
 });
 
 $("#sortbyMajor").hide();
+$("#rateLine").hide();

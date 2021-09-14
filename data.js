@@ -1,6 +1,7 @@
 let dataset = [
   {
     Major: "CONSTRUCTION SERVICES",
+    // Major_category: "Industrial Arts",
     Major_category: "Industrial Arts & Consumer Services",
     Grad_total: 9173,
     Grad_sample_size: 200,

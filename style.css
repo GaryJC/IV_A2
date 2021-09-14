@@ -1,9 +1,8 @@
 .filter {
   display: flex;
   justify-content: left;
-  padding-left: 4vw;
 }
 
 .filter > * {
-  padding-left: 2vw;
+  margin-left: 2vw;
 }
