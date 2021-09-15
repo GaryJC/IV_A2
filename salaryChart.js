@@ -31,14 +31,17 @@ var mapData = (newData, dataKey, dataVal, bool) => {
     }
   }
   if (bool) {
-    if (bool == "ungrad") {
-      for (let [key, val] of ungrad_salary_med_map) {
-        ungrad_salary_med_map.set(key, val / category_count.get(key));
-      }
-    } else {
-      for (let [key, val] of grad_salary_med_map) {
-        grad_salary_med_map.set(key, val / category_count.get(key));
-      }
+    //   if (bool == "ungrad") {
+    //     for (let [key, val] of ungrad_salary_med_map) {
+    //       ungrad_salary_med_map.set(key, val / category_count.get(key));
+    //     }
+    //   } else {
+    //     for (let [key, val] of grad_salary_med_map) {
+    //       grad_salary_med_map.set(key, val / category_count.get(key));
+    //     }
+    //   }
+    for (let [key, val] of newData) {
+      newData.set(key, val / category_count.get(key));
     }
   }
   return newData;
@@ -61,9 +64,9 @@ let ungrad_salary_med_map = new Map();
 mapData(ungrad_salary_med_map, "Major_category", "Nongrad_median", "ungrad");
 
 let category_label = [...grad_salary_med_map.keys()];
-let category_grad_salary_med = [...grad_salary_med_map.values()];
+// let category_grad_salary_med = [...grad_salary_med_map.values()];
 
-let category_ungrad_salary_med = [...ungrad_salary_med_map.values()];
+// let category_ungrad_salary_med = [...ungrad_salary_med_map.values()];
 
 for (i = 0; i < dataset.length; i++) {
   all_major_label.push(dataset[i].Major);
@@ -78,14 +81,14 @@ let data = {
   datasets: [
     {
       label: "Graduate Earnings",
-      data: category_grad_salary_med,
+      data: [...grad_salary_med_map.values()],
       backgroundColor: "rgba(54, 162, 235, 0.4)",
       hoverBackgroundColor: "rgba(54, 162, 235, 0.8)",
       maxBarThickness: 80,
     },
     {
       label: "Undergraduate Earnings",
-      data: category_ungrad_salary_med,
+      data: [...ungrad_salary_med_map.values()],
       backgroundColor: "rgba(255, 99, 132, 0.4)",
       hoverBackgroundColor: "rgba(255, 99, 132, 0.8)",
       maxBarThickness: 80,
@@ -227,6 +230,17 @@ $("#majorForm input").on("change", () => {
     salaryChart.config.data.datasets[1].data = ungrad_salary_med;
     salaryChart.config.options.plugins.subtitle.text = "Majors";
     // salaryChart.config.options.scales.x.ticks.display = false;
+
+    // hide the unemployment rate line when click show all majors
+    if (isLineShown === true) {
+      for (let i = 0; i < 2; i++) {
+        salaryChart.config.data.datasets.pop();
+      }
+      salaryChart.config.options.scales.unempRateAxis.display = false;
+      $("#showLine").prop("checked", false);
+      $("#rateLine").hide();
+      isLineShown = false;
+    }
     salaryChart.update();
   } else {
     isFiltered = false;
@@ -278,6 +292,14 @@ document.getElementById("salaryChart").onclick = function (evt) {
     filteredUngradData = new Map(
       filteredData.map((i) => [i.Major, i.Nongrad_median])
     );
+
+    gradUnempRate = new Map(
+      filteredData.map((i) => [i.Major, i.Grad_unemployment_rate * 100])
+    );
+    ungradUnempRate = new Map(
+      filteredData.map((i) => [i.Major, i.Nongrad_unemployment_rate * 100])
+    );
+
     filteredLabel = filteredData.map((item) => item.Major);
     salaryChart.config.data.labels = filteredLabel;
     salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
@@ -328,15 +350,23 @@ $("#sortbyMajor").change(() => {
   if (isLineShown === false) {
     if ($("#sortbyMajor").val() == "asc_grad") {
       sortByAsc(filteredGradData, filteredUngradData, 0, 1);
+      sortByAscGradFilter(filteredGradData, gradUnempRate);
+      sortByAscUngradFilter(filteredGradData, ungradUnempRate);
     }
     if ($("#sortbyMajor").val() == "dsc_grad") {
       sortByDsc(filteredGradData, filteredUngradData, 0, 1);
+      sortByDscGradFilter(filteredGradData, gradUnempRate);
+      sortByDscUngradFilter(filteredGradData, ungradUnempRate);
     }
     if ($("#sortbyMajor").val() == "asc_ungrad") {
       sortByAsc(filteredUngradData, filteredGradData, 1, 0);
+      sortByAscGradFilter(filteredUngradData, gradUnempRate);
+      sortByAscUngradFilter(filteredUngradData, ungradUnempRate);
     }
     if ($("#sortbyMajor").val() == "dsc_ungrad") {
       sortByDsc(filteredUngradData, filteredGradData, 1, 0);
+      sortByDscGradFilter(filteredUngradData, gradUnempRate);
+      sortByDscUngradFilter(filteredUngradData, ungradUnempRate);
     }
   } else {
     if ($("#sortbyMajor").val() == "asc_grad") {
