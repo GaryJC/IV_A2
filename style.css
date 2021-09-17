@@ -1,8 +1,98 @@
 .filter {
   display: flex;
-  justify-content: left;
+  justify-content: center;
+  font-family: "Lato", sans-serif;
+  font-weight: bold;
 }
 
-.filter > * {
-  margin-left: 2vw;
+.filter > *:not(:first-child) {
+  margin-right: 2rem;
+}
+
+#sortbyMajor,
+#sortby {
+  border-width: 0.1rem;
+}
+
+#typeForm label {
+  margin-right: 0.5rem;
+}
+
+#reset {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: rgb(54, 117, 233);
+  color: white;
+  border-color: rgb(54, 117, 233);
+  font-weight: bold;
+  border-radius: 10%;
+  padding: 0.5rem 0.8rem 0.5rem 0.8rem;
+}
+
+#homepage {
+  background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    url("src/image-20150817-5083-1gbq5tv.jpg");
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+#salaryPage {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url("src/salary-shutterstock_313380641-min.jpg");
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+#unempPage {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("src/unemployed.jpg");
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+#gradPage {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("src/AdobeStock_344051346-scaled.jpeg");
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.homeTitle {
+  text-align: center;
+  width: 50vw;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+}
+
+.mainTitle {
+  color: white;
+  font-size: 5.5rem;
+}
+
+.subTitle {
+  color: white;
+  font-size: 2.5rem;
+}
+
+#chartSection {
+  height: 95vh;
+  padding: 0 1rem 0 1rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.fp-slidesNav {
+  display: flex;
+  justify-content: center;
 }

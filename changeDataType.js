@@ -1,11 +1,10 @@
+// the function of changing data type
 $("#typeForm input").on("change", () => {
   let selVal = $("input[name=dataType]:checked", "#typeForm").val();
   $("#sortbyMajor").val("dummy");
+  $("#sortby").val("dummy");
   if (isAll === false) {
     if (selVal === "med") {
-      // salaryChart.config.data.datasets[0].data = category_grad_salary_med;
-      // salaryChart.config.data.datasets[1].data = category_ungrad_salary_med;
-      // salaryChart.update();
       let medCatGrad = new Map();
       let medCatUngrad = new Map();
       grad_salary_med_map = mapData(
@@ -79,8 +78,6 @@ $("#typeForm input").on("change", () => {
   }
   if (isAll === true) {
     if (selVal === "med") {
-      // salaryChart.config.data.datasets[0].data = grad_salary_med;
-      // salaryChart.config.data.datasets[1].data = ungrad_salary_med;
       let medAllGrad = new Map();
       let medAllUngrad = new Map();
       grad_major_salary_med_map = mapData(medAllGrad, "Major", "Grad_median");
@@ -162,47 +159,3 @@ $("#typeForm input").on("change", () => {
     salaryChart.update();
   }
 });
-
-// var catTypeChange = (gradDataType, ungradDataType) => {
-//   let gradType = new Map();
-//   let ungradType = new Map();
-//   this.grad_salary_med_map = mapData(
-//     gradType,
-//     "Major_category",
-//     gradDataType,
-//     "grad"
-//   );
-//   (this.ungrad_salary_med_map = mapData(
-//     ungradType,
-//     "Major_category",
-//     ungradDataType
-//   )),
-//     "ungrad";
-//   salaryChart.config.data.datasets[0].data = [...grad_salary_med_map.values()];
-//   salaryChart.config.data.datasets[1].data = [
-//     ...ungrad_salary_med_map.values(),
-//   ];
-//   salaryChart.config.data.labels = category_label;
-
-//   salaryChart.update();
-// };
-
-// var majorTypeChange = (gradDataType, ungradDataType) => {
-//   let gradType = new Map();
-//   let ungradType = new Map();
-//   this.grad_major_salary_med_map = mapData(gradType, "Major", gradDataType);
-//   this.ungrad_major_salary_med_map = mapData(
-//     ungradType,
-//     "Major",
-//     ungradDataType
-//   );
-//   salaryChart.config.data.datasets[0].data = [
-//     ...grad_major_salary_med_map.values(),
-//   ];
-//   salaryChart.config.data.datasets[1].data = [
-//     ...ungrad_major_salary_med_map.values(),
-//   ];
-//   salaryChart.config.data.labels = all_major_label;
-
-//   salaryChart.update();
-// };

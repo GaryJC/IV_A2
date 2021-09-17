@@ -1,13 +1,8 @@
 let isLineShown = false;
 $("#rateLine input").on("change", () => {
   if ($("input[name=showLine]:checked", "#rateLine").val() === "showLine") {
-    // gradUnempRate = new Map(
-    //   filteredData.map((i) => [i.Major, i.Grad_unemployment_rate * 100])
-    // );
-    // ungradUnempRate = new Map(
-    //   filteredData.map((i) => [i.Major, i.Nongrad_unemployment_rate * 100])
-    // );
-
+    salaryChart.config.options.plugins.title.text =
+      "Earnings & Unempolyment Rate";
     const gradDataset = {
       label: "Graduate Unemployment Rate",
       type: "line",
@@ -31,6 +26,7 @@ $("#rateLine input").on("change", () => {
     salaryChart.update();
     isLineShown = true;
   } else {
+    salaryChart.config.options.plugins.title.text = "Earnings";
     for (let i = 0; i < 2; i++) {
       salaryChart.config.data.datasets.pop();
     }

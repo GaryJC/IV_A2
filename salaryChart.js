@@ -3,7 +3,7 @@ let grad_salary_med = [];
 let ungrad_salary_med = [];
 let grad_salary_p25 = [];
 let grad_salary_p75 = [];
-
+let showRadar = false;
 let category_count = new Map();
 for (i = 0; i < dataset.length; i++) {
   if (category_count.has(dataset[i].Major_category)) {
@@ -18,7 +18,7 @@ for (i = 0; i < dataset.length; i++) {
 
 var dataGrad, dataUngrad;
 
-//map with majors and corresponded grad salary
+//map with majors and corresponded salary
 var mapData = (newData, dataKey, dataVal, bool) => {
   for (i = 0; i < dataset.length; i++) {
     if (newData.has(dataset[i][dataKey])) {
@@ -31,15 +31,6 @@ var mapData = (newData, dataKey, dataVal, bool) => {
     }
   }
   if (bool) {
-    //   if (bool == "ungrad") {
-    //     for (let [key, val] of ungrad_salary_med_map) {
-    //       ungrad_salary_med_map.set(key, val / category_count.get(key));
-    //     }
-    //   } else {
-    //     for (let [key, val] of grad_salary_med_map) {
-    //       grad_salary_med_map.set(key, val / category_count.get(key));
-    //     }
-    //   }
     for (let [key, val] of newData) {
       newData.set(key, val / category_count.get(key));
     }
@@ -96,64 +87,92 @@ let data = {
   ],
 };
 
-let config = {
-  type: "bar",
-  data: data,
-  options: {
-    onHover: (event, chartElement) => {
-      if (isAll == true || isFiltered == true) {
-        document.getElementById("salaryChart").style.cursor = "default";
-      } else {
-        document.getElementById("salaryChart").style.cursor = chartElement[0]
-          ? "pointer"
-          : "default";
-      }
-    },
-    plugins: {
-      title: {
-        display: true,
-        text: "College Majors Earnings",
-        font: { size: 20 },
+let defaultOption = {
+  onHover: (event, chartElement) => {
+    // if (isAll == true) {
+    //   document.getElementById("salaryChart").style.cursor = "default";
+    // } else {
+    //   document.getElementById("salaryChart").style.cursor = chartElement[0]
+    //     ? "pointer"
+    //     : "default";
+    // }
+    document.getElementById("salaryChart").style.cursor = chartElement[0]
+      ? "pointer"
+      : "default";
+  },
+  plugins: {
+    legend: {
+      onHover: function (e) {
+        if (e) {
+          console.log(e);
+          document.getElementById("salaryChart").style.cursor = "pointer";
+        }
       },
-      subtitle: {
-        display: true,
-        text: "Major Categories",
-        font: { size: 16, weight: "bold" },
+      onLeave: function (e) {
+        if (e) {
+          console.log(e);
+          document.getElementById("salaryChart").style.cursor = "default";
+        }
       },
-    },
-    responsive: true,
-    scales: {
-      x: {
-        stacked: true,
-        ticks: {
-          display: true,
-          callback: function (value) {
-            if (this.getLabelForValue(value).length > 10) {
-              return this.getLabelForValue(value).substr(0, 11) + "...";
-            }
-            return this.getLabelForValue(value);
-          },
+      display: true,
+      labels: {
+        font: {
+          size: 15,
         },
       },
-      y: {
-        stacked: true,
-      },
-      unempRateAxis: {
-        type: "linear",
-        display: false,
-        position: "right",
+    },
 
-        // grid line settings
-        grid: {
-          drawOnChartArea: false, // only want the grid lines for one axis to show up
+    title: {
+      display: true,
+      text: "Earnings",
+      font: { family: "'Lato', sans-serif", size: 20, weight: 800 },
+    },
+    subtitle: {
+      display: true,
+      text: "Major Categories",
+      font: { family: "'Lato', sans-serif", size: 16, weight: 800 },
+    },
+  },
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      stacked: true,
+      ticks: {
+        display: true,
+        callback: function (value) {
+          if (this.getLabelForValue(value).length > 10) {
+            return this.getLabelForValue(value).substr(0, 11) + "...";
+          }
+          return this.getLabelForValue(value);
         },
+      },
+    },
+    y: {
+      stacked: true,
+    },
+    unempRateAxis: {
+      type: "linear",
+      display: false,
+      position: "right",
+
+      // grid line settings
+      grid: {
+        drawOnChartArea: false, // only want the grid lines for one axis to show up
       },
     },
   },
 };
 
+let config = {
+  type: "bar",
+  data: data,
+  options: defaultOption,
+};
+
 var salaryChart = new Chart(document.getElementById("salaryChart"), config);
 
+// sort functon
 var sortByAsc = (main, rely, f, s) => {
   main = new Map([...main].sort((a, b) => a[1] - b[1]));
   salaryChart.config.data.labels = [...main.keys()];
@@ -217,19 +236,21 @@ $("#sortby").change(() => {
 
 let isAll = false;
 
+// show all majors
 $("#majorForm input").on("change", () => {
   if ($("input[name=showAll]:checked", "#majorForm").val() === "showAll") {
     $("#sortbyMajor").hide();
+    $("#rateLine").hide();
     $("#sortby").show();
     salaryChart.config.data.datasets[0].hidden = false;
     salaryChart.config.data.datasets[1].hidden = false;
     isFiltered = true;
     isAll = true;
+    showRadar = true;
     salaryChart.config.data.labels = all_major_label;
     salaryChart.config.data.datasets[0].data = grad_salary_med;
     salaryChart.config.data.datasets[1].data = ungrad_salary_med;
     salaryChart.config.options.plugins.subtitle.text = "Majors";
-    // salaryChart.config.options.scales.x.ticks.display = false;
 
     // hide the unemployment rate line when click show all majors
     if (isLineShown === true) {
@@ -243,6 +264,7 @@ $("#majorForm input").on("change", () => {
     }
     salaryChart.update();
   } else {
+    showRadar = false;
     isFiltered = false;
     isAll = false;
     salaryChart.config.data.labels = category_label;
@@ -254,11 +276,11 @@ $("#majorForm input").on("change", () => {
       grad_salary_med_map
     );
     salaryChart.config.options.plugins.subtitle.text = "Major Categories";
-    // salaryChart.config.options.scales.x.ticks.display = true;
     salaryChart.update();
   }
 });
 
+// show specific major
 let isFiltered = false;
 let datasetIndex,
   selectedCat,
@@ -266,22 +288,26 @@ let datasetIndex,
   filteredLabel,
   filteredGradData,
   filteredUngradData;
-
+var activePoints;
 document.getElementById("salaryChart").onclick = function (evt) {
-  var activePoints = salaryChart.getElementsAtEventForMode(
+  activePoints = salaryChart.getElementsAtEventForMode(
     evt,
     "point",
     salaryChart.options
   );
+  if (activePoints.length) {
+    radar();
+  }
+
   console.log(activePoints);
   if (isFiltered == false && activePoints.length) {
     $("#sortbyMajor").show();
     $("#sortby").hide();
+    $("#majorForm").hide();
     $("#rateLine").show();
     console.log(activePoints);
     datasetIndex = activePoints[0].datasetIndex;
     selectedCat = salaryChart.config.data.labels[activePoints[0].index];
-
     filteredData = dataset.filter((item) => {
       return item.Major_category == selectedCat;
     });
@@ -305,47 +331,15 @@ document.getElementById("salaryChart").onclick = function (evt) {
     salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
     salaryChart.config.data.datasets[1].data = [...filteredUngradData.values()];
     isFiltered = true;
-    // if (datasetIndex == 0) {
-    //   salaryChart.config.data.labels = filteredLabel;
-    //   salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
-    //   salaryChart.config.data.datasets[1].data = [
-    //     ...filteredUngradData.values(),
-    //   ];
-    //   salaryChart.config.data.datasets[1].hidden = true;
-    //   isFiltered = true;
-    // } else if (datasetIndex == 1) {
-    //   salaryChart.config.data.labels = filteredLabel;
-    //   salaryChart.config.data.datasets[1].data = [
-    //     ...filteredUngradData.values(),
-    //   ];
-    //   salaryChart.config.data.datasets[0].data = [...filteredGradData.values()];
-    //   salaryChart.config.data.datasets[0].hidden = true;
-    //   isFiltered = true;
-    // }
-    salaryChart.config.options.plugins.subtitle.text = "Majors";
+    showRadar = true;
+    // salaryChart.config.options.plugins.title.text = "Major -- " + selectedCat;
+    salaryChart.config.options.plugins.subtitle.text =
+      "Major Category -- " + selectedCat;
     salaryChart.update();
   }
 };
 
-// $("#sortbyMajor").change(() => {
-//   // order grad salary by asc
-//   if ($("#sortbyMajor").val() == "asc_major" && datasetIndex == 0) {
-//     sortByAsc(filteredGradData, filteredUngradData, 0, 1);
-//   }
-//   // sortByAsc(gradUnempRate, ungradUnempRate, 2, 3);
-
-//   if ($("#sortbyMajor").val() == "dsc_major" && datasetIndex == 0) {
-//     sortByDsc(filteredGradData, filteredUngradData, 0, 1);
-//   }
-//   if ($("#sortbyMajor").val() == "asc_major" && datasetIndex == 1) {
-//     sortByAsc(filteredUngradData, filteredGradData, 1, 0);
-//   }
-//   if ($("#sortbyMajor").val() == "dsc_major" && datasetIndex == 1) {
-//     sortByDsc(filteredUngradData, filteredGradData, 1, 0);
-//   }
-//   salaryChart.update();
-// });
-
+// sort by specific category
 $("#sortbyMajor").change(() => {
   if (isLineShown === false) {
     if ($("#sortbyMajor").val() == "asc_grad") {
@@ -390,16 +384,20 @@ $("#sortbyMajor").change(() => {
       sortByDsc(filteredUngradData, ungradUnempRate, 1, 3);
     }
   }
-  // else {
-  //   for (let i = 0; i < 2; i++) {
-  //     salaryChart.config.data.datasets.pop();
-  //   }
-  //   salaryChart.config.options.scales.unempRateAxis.display = false;
 
-  //   $("#showLine").prop("checked", false);
-  // }
   salaryChart.update();
 });
 
 $("#sortbyMajor").hide();
 $("#rateLine").hide();
+$("#reset").hide();
+
+$("#reset").click(function () {
+  showRadar = true;
+  $(".filter").show();
+  $("#reset").hide();
+  salaryChart.config.type = "bar";
+  salaryChart.config.data = data;
+  salaryChart.config.options = defaultOption;
+  salaryChart.update();
+});
