@@ -40,6 +40,26 @@ var radar = function () {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
+        legend: {
+          onHover: function (e) {
+            if (e) {
+              console.log(e);
+              document.getElementById("salaryChart").style.cursor = "pointer";
+            }
+          },
+          onLeave: function (e) {
+            if (e) {
+              console.log(e);
+              document.getElementById("salaryChart").style.cursor = "default";
+            }
+          },
+          display: true,
+          labels: {
+            font: {
+              size: 15,
+            },
+          },
+        },
         labels: {
           font: {
             size: 15,

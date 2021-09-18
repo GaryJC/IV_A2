@@ -4,6 +4,7 @@ let ungrad_salary_med = [];
 let grad_salary_p25 = [];
 let grad_salary_p75 = [];
 let showRadar = false;
+// categorize the major
 let category_count = new Map();
 for (i = 0; i < dataset.length; i++) {
   if (category_count.has(dataset[i].Major_category)) {
